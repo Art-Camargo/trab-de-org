@@ -16,9 +16,11 @@ architecture rtl of corex is
    signal pc_enable : std_logic := '0';
    signal address :  std_logic_vector (7  downto 0);
   -- INSTRUCTION DECODER
- 
+   signal jump_enable : std_logic := '0';
+   signal jump_address : std_logic_vector (7  downto 0);
 
   signal program_counter               : std_logic_vector (7  downto 0) := "00000000";
+  signal pc_test               : std_logic_vector (7  downto 0) := "00000000";
   signal mem_write_enable_signal       : std_logic := '0';
   signal mem_read_enable_signal        : std_logic := '0';
   signal memory_out_signal        : std_logic_vector (15 downto 0);
@@ -61,9 +63,12 @@ architecture rtl of corex is
 	
 	 component inc is
 		port(        
+		 jmp :  in std_logic_vector (7  downto 0) ;
+     jmp_e : in std_logic ;
 		   clk: in std_logic;
             pc : out std_logic_vector (7  downto 0);
-            pc_enable : in std_logic
+            pc_enable : in std_logic;
+            test : out std_logic_vector (7  downto 0)
           );      
 	end component;
 	
@@ -81,6 +86,8 @@ architecture rtl of corex is
      
     component control_unit is 
         port (
+        jmp :  out std_logic_vector (7  downto 0);
+        jmp_e : out std_logic ;
         data_to_write : out  std_logic_vector(15 downto 0);
         data_memory_out_signal : in std_logic_vector(15 downto 0);
         reg1 : out std_logic_vector(15 downto 0);
@@ -111,6 +118,8 @@ architecture rtl of corex is
   
     control_i : control_unit 
         port map(
+        jmp => jump_address,
+        jmp_e => jump_enable,
         data_to_write => data_memory_in_signal,
         data_memory_out_signal => data_memory_out_signal,
         reg1 => reg1,
@@ -143,12 +152,15 @@ architecture rtl of corex is
            
             rst_n            => rst_n,           
             
-            pc               => program_counter,   
+            pc               => pc_test,   
             data_fetched     => memory_out_signal 
           );
           
          inc_i : inc
             port map(
+            jmp => jump_address,
+        jmp_e => jump_enable, 
+            test => pc_test,
             clk => clk,
             pc => program_counter,
             pc_enable => pc_enable

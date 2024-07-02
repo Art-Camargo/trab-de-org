@@ -14,7 +14,7 @@ entity memory is
         clk                 : in  std_logic;
         rst_n               : in  std_logic;        
 
-        pc                  : in  std_logic_vector(7  downto 0);
+        pc                  : in  std_logic_vector(7  downto 0) := "00000000";
         data_fetched        : out std_logic_vector(15 downto 0)
 	);
         
@@ -34,14 +34,14 @@ begin
 			
 	if(rst_n = '1') then
 		--  reset memory when rst_n = 1  
-		mem(0)    <= "1000000001110010"; 
-		mem(1)    <= "1000000001110010";
-		mem(2)    <= "0000000000000000";
+		mem(0)    <= "0111000001110010"; 
+		mem(1)    <= "0111000010000100";
+		mem(2)    <= "0010111001010000";
 		mem(3)    <= "0000000000000000";
 		mem(4)    <= "0000000000000000";
 		mem(5)    <= "0000000000000000"; 
 		mem(6)    <= "0000000000000000";
-		mem(7)    <= "0000000000000000";
+		mem(7)    <= "1111111111111111";
 		mem(8)    <= "0000000000000000";
 		mem(9)    <= "0000000000000000";
 		mem(10)   <= "0000000000000000";

@@ -27,9 +27,12 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity inc is
   Port (
+    jmp :  in std_logic_vector (7  downto 0) ;
+     jmp_e : in std_logic ;
     clk: in std_logic;
     pc : out std_logic_vector (7  downto 0);
-    pc_enable: in std_logic
+    pc_enable: in std_logic;
+    test : out  std_logic_vector (7  downto 0) := "00000000"
   );
 end inc;
 
@@ -41,10 +44,16 @@ begin
    process(clk)
        begin 
             if (clk'event and clk='1') then
-               if (pc_enable = '1') then
-                    program_counter <= program_counter + "00000001";
-                    pc <= program_counter ;
+               if (jmp_e = '1') then 
+               program_counter <= jmp;
+               
+            
+               elsif (pc_enable = '1') then
+                   program_counter <= program_counter + "00000001";
+      
                end if;
             end if;
+           
     end process;
+     test <= program_counter;
 end Behavioral;

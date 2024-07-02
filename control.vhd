@@ -5,6 +5,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity control_unit is
     Port ( 
+    jmp :  out std_logic_vector (7  downto 0) := "00000000";
+     jmp_e : out std_logic := '0';
     data_to_write : out  std_logic_vector(15 downto 0);
     data_memory_out_signal : in std_logic_vector(15 downto 0);
     reg2 : out std_logic_vector(15 downto 0);
@@ -43,7 +45,8 @@ architecture rtl of control_unit is
         PROX,
         BEQ,
         LOAD_REG,
-        JUMP
+        JUMP,
+        RESP_ULA
         
     );
     signal current : state_type;    
@@ -70,6 +73,7 @@ begin
     process(clk,current)
         begin
             --nextstate <= current;
+            jmp_e <= '0';
             pc_enable <= '0';
             case (current) is
             
@@ -145,8 +149,24 @@ begin
                          when "0100" => ula_op_resp <= not ula_op_a;
                          when others => ula_op_resp <=  "0000000000000000";
                     end case;
-                    nextstate <= PROX;
+                    nextstate <= RESP_ULA;
                     
+                 
+                when RESP_ULA => 
+                      
+                    case (instruction(11 downto 9)) is 
+                    
+                        when "001" => reg1 <= ula_op_resp;
+                        when "010" => reg2 <= ula_op_resp;
+                        when "011" => reg3 <= ula_op_resp;
+                        when "100" => reg4 <= ula_op_resp;
+                        when "101" => reg5 <= ula_op_resp;
+                        when "110" => reg6 <= ula_op_resp;
+                        when "111" => reg7 <= ula_op_resp;
+                        when others => reg1 <= "0000000000000000";
+                    end case;
+                    
+                    nextstate <= PROX;
                 -- load OK (full)
                 when LOAD => 
                     write_enable <= '0';
@@ -168,7 +188,7 @@ begin
                      
                      
                 when STORE => 
-                    write_enable <= '1';
+                     write_enable <= '1';
                      address <= instruction(11 downto 4);
                      case (instruction(3 downto 1)) is 
                         when "001" => data_to_write <= reg1_read;
@@ -184,10 +204,12 @@ begin
                 
                 
                 when JUMP => 
-                   
-                    nextstate <= PROX;
+                   jmp_e <= '1';
+                   jmp <=  instruction(11 downto 4);
+                   nextstate <= PROX;
                
                 when others => -- PROX
+                   
                    pc_enable <= '1';
                      
                     nextstate <= FETCH;
