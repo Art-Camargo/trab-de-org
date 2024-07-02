@@ -46,7 +46,8 @@ architecture rtl of control_unit is
         BEQ,
         LOAD_REG,
         JUMP,
-        RESP_ULA
+        RESP_ULA,
+        BEQ_DECISION
         
     );
     signal current : state_type;    
@@ -207,6 +208,38 @@ begin
                    jmp_e <= '1';
                    jmp <=  instruction(11 downto 4);
                    nextstate <= PROX;
+                   
+                when BEQ => 
+                    jmp <= "11" & instruction(11 downto 6);
+                      case (instruction(5 downto 3)) is 
+                        when "001" => ula_op_a <= reg1_read;
+                        when "010" => ula_op_a <= reg2_read;
+                        when "011" => ula_op_a <= reg3_read;
+                        when "100" => ula_op_a <= reg4_read;
+                        when "101" => ula_op_a <= reg5_read;
+                        when "110" => ula_op_a <= reg6_read;
+                        when "111" => ula_op_a <= reg7_read;
+                        when others => ula_op_a <= "0000000000000000";
+                    end case;
+                    
+                    case (instruction(2 downto 0)) is 
+                        when "001" => ula_op_b <= reg1_read;
+                        when "010" => ula_op_b <= reg2_read;
+                        when "011" => ula_op_b <= reg3_read;
+                        when "100" => ula_op_b <= reg4_read;
+                        when "101" => ula_op_b <= reg5_read;
+                        when "110" => ula_op_b <= reg6_read;
+                        when "111" => ula_op_b <= reg7_read;
+                        when others => ula_op_b <= "0000000000000000";
+                    end case;
+                    
+                    nextstate <= BEQ_DECISION;
+               
+               when BEQ_DECISION => 
+                    if (ula_op_a = ula_op_b) then
+                         jmp_e <= '1';
+                    end if;
+                     nextstate <= PROX;
                
                 when others => -- PROX
                    
