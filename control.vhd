@@ -113,6 +113,7 @@ begin
                         
                     
                      when others => 
+                        nextstate <= PROX;
                   end case;
                   
                   
@@ -207,10 +208,10 @@ begin
                 when JUMP => 
                    jmp_e <= '1';
                    jmp <=  instruction(11 downto 4);
-                   nextstate <= PROX;
+                   nextstate <= FETCH;
                    
                 when BEQ => 
-                    jmp <= "11" & instruction(11 downto 6);
+                    jmp <= "00" & instruction(11 downto 6);
                       case (instruction(5 downto 3)) is 
                         when "001" => ula_op_a <= reg1_read;
                         when "010" => ula_op_a <= reg2_read;
@@ -238,8 +239,10 @@ begin
                when BEQ_DECISION => 
                     if (ula_op_a = ula_op_b) then
                          jmp_e <= '1';
+                        nextstate <= FETCH;
+                    else
+                        nextstate <= PROX;
                     end if;
-                     nextstate <= PROX;
                
                 when others => -- PROX
                    

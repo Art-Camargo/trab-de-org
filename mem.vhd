@@ -33,24 +33,26 @@ process(clk)
 begin
 			
 	if(rst_n = '1') then
-		--  reset memory when rst_n = 1  
-		mem(0)    <= "0111000001110010"; 
-		mem(1)    <= "0111000010000100";
-		mem(2)    <= "0110000000010001";
-		mem(3)    <= "0000000000000000";
-		mem(4)    <= "0000000000000000";
-		mem(5)    <= "0000000000000000"; 
-		mem(6)    <= "0000000000000000";
-		mem(7)    <= "1111111111111111";
-		mem(8)    <= "0000000000000000";
-		mem(9)    <= "0000000000000000";
-		mem(10)   <= "0000000000000000";
-		mem(11)   <= "0000000000000000";
-		mem(12)   <= "0000000000000000";
-		mem(13)   <= "0000000000000000";
-		mem(14)   <= "0000000000000000";
-		mem(15)   <= "0000000000000000"; 
-		mem(16)   <= "0000000000000000"; 
+		-- --  reset memory when rst_n = 1  
+		mem(0)    <= "0111000000000010"; --LOAD mem(0) in R1 (base)
+		mem(1)    <= "0111000000010100"; --LOAD mem(1) in R2 (expoente)
+		mem(2)    <= "0111000000000110"; --LOAD mem(0) in R3 (resultado)
+		mem(3)    <= "0111000000111000"; --LOAD mem(3) in R4 (contador para potência iniciado em 1)
+		mem(4)	  <= "0111000000111100"; --LOAD mem(3) in R6 (constante 1)
+		--VERIFICAR SE TERMINOU A POTÊNCIA
+		mem(5)    <= "0110001111100010"; -- BEQ (Comparação de R4 com R2) (salvar o resultado - instrução 15)
+		mem(6)    <= "0001100100110000"; --ADD R4, R6, R4
+		mem(7)    <= "0111000000111010"; --LOAD mem(3) in R5 (contador para multiplicação resetado em 1)
+		mem(8)	  <= "1000000010010110"; --STORE R3 in mem(9)
+		mem(9)    <= "0111000010011110"; --LOAD mem(3) in R7 (base aux)
+		--VERIFICAR SE TERMINOU A MULTIPLICAÇÃO
+		mem(10)   <= "0110000101101001"; -- BEQ (Comparação de R5 com R1) (volta para verificar potência - instrução 5)
+		mem(11)   <= "0001011011111000"; -- ADD base aux no resultado (R3 = R3 + R7)
+		mem(12)   <= "0001101101110000"; -- ADD 1 no contador de multiplicação (R5 = R5 + R6)
+		mem(13)   <= "0101000010100000"; -- JUMP para verificar se terminou a multiplicação (instrução 10)
+		mem(14)   <= "0000000000000000"; -- NOP
+		mem(15)   <= "1000000010100110"; -- STORE do resultado (R3) em mem(10)
+		mem(16)   <= "0000000000000000"; -- NOP
 		mem(17)   <= "0000000000000000"; 
 		mem(18)   <= "0000000000000000"; 
 		mem(19)   <= "0000000000000000"; 
