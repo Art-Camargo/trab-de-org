@@ -49,6 +49,20 @@ architecture rtl of corex is
   -- ALU
   signal alu_op             : std_logic_vector (3 downto 0);
   
+  component register_bank is
+        port(        
+            clk : in std_logic;
+            r0  : in std_logic_vector(15 downto 0);
+            r1  : in std_logic_vector(15 downto 0);
+            r2  : in std_logic_vector(15 downto 0);
+            r3  : in std_logic_vector(15 downto 0);
+            r4  : in std_logic_vector(15 downto 0);
+            r5  : in std_logic_vector(15 downto 0);
+            r6  : in std_logic_vector(15 downto 0);
+            r7  : in std_logic_vector(15 downto 0)
+         );    
+  end component;
+  
   component memory is
 		port(        
 		  clk               : in  std_logic;
@@ -115,6 +129,19 @@ architecture rtl of corex is
     end component;
 
   begin  
+  
+    register_bank_i : register_bank
+        port map (
+            clk => clk,
+            r0 => regzero,
+            r1   => reg1,
+            r2   => reg2,
+            r3  => reg3,
+            r4   => reg4,
+            r5   => reg5,
+            r6   => reg6,
+            r7   => reg7
+        );
   
     control_i : control_unit 
         port map(
